@@ -1,81 +1,50 @@
-body { font-family: 'Inter', sans-serif; }
-.nav-link.active { background: #3b82f6; color: white; box-shadow: 0 4px 12px rgba(59,130,246,0.3); }
-.nav-link:not(.active):hover { background: #f1f5f9; color: #3b82f6; }
-.suggestion-box { position: absolute; width: 100%; max-height: 200px; overflow-y: auto; background: white; border: 1px solid #e2e8f0; border-radius: 8px; z-index: 100; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
-::-webkit-scrollbar { width: 5px; }
-::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-
-/* Sidebar Animation */
-#sidebar {
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+:root {
+    --primary: #3498db; --secondary: #95a5a6; --danger: #e74c3c;
+    --success: #2ecc71; --bg: #f4f7f6; --text: #333;
 }
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+body { background: var(--bg); color: var(--text); overflow: hidden; }
 
-/* Nav Link Styling */
-.nav-link.active {
-    background: #3b82f6;
-    color: white;
-    box-shadow: 0 10px 20px -5px rgba(59, 130, 246, 0.4);
-}
+.app-container { display: flex; height: 100vh; }
 
-.nav-link:not(.active):hover {
-    background: #f8fafc;
-    color: #3b82f6;
-}
+/* Sidebar */
+#sidebar { width: 250px; background: #2c3e50; color: white; display: flex; flex-direction: column; transition: 0.3s; }
+#sidebar.hidden { margin-left: -250px; }
+.sidebar-header { padding: 20px; text-align: center; background: #1a252f; }
+.sidebar-nav { flex: 1; display: flex; flex-direction: column; }
+.sidebar-nav a { padding: 15px 20px; color: #ecf0f1; text-decoration: none; border-bottom: 1px solid #34495e; }
+.sidebar-nav a:hover, .sidebar-nav a.active { background: var(--primary); }
+.sidebar-footer { padding: 15px; background: #1a252f; text-align: center; }
 
-/* Modal Overlay Blur */
-#modalOverlay {
-    transition: all 0.3s ease;
-}
+/* Main Content */
+#main-content { flex: 1; display: flex; flex-direction: column; overflow-y: auto; }
+header { background: white; padding: 15px 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); display: flex; align-items: center; gap: 15px; }
+.btn-icon { background: none; border: none; font-size: 24px; cursor: pointer; }
+#content-area { padding: 20px; }
 
-/* Suggestion Box */
-.suggestion-box {
-    position: absolute;
-    width: 100%;
-    max-height: 200px;
-    overflow-y: auto;
-    background: white;
-    border: 1px solid #e2e8f0;
-    border-radius: 1rem;
-    z-index: 100;
-    margin-top: 6px;
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-}
+/* Pages */
+.page { display: none; }
+.page.active { display: block; animation: fadeIn 0.3s ease-in; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-/* Custom Scrollbar */
-::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
+/* Cards & Buttons */
+.stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+.stat-card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); font-weight: bold; font-size: 1.2rem; }
+.btn { padding: 10px 15px; border: none; border-radius: 4px; cursor: pointer; color: white; }
+.btn-primary { background: var(--primary); }
+.btn-secondary { background: var(--secondary); }
+.btn-danger { background: var(--danger); }
+.mt-2 { margin-top: 20px; }
 
-/* Success Animation */
-#successOverlay i {
-    animation: scaleCheck 0.5s ease-out;
-}
+/* Tables */
+.table-container { background: white; border-radius: 8px; overflow: hidden; margin-top: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+table { width: 100%; border-collapse: collapse; }
+th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #ddd; }
+th { background: #f8f9fa; }
 
-@keyframes scaleCheck {
-    0% { transform: scale(0); opacity: 0; }
-    70% { transform: scale(1.2); }
-    100% { transform: scale(1); opacity: 1; }
-}
-
-
-/* Pastikan sidebar bisa benar-benar sembunyi */
-#sidebar.w-0 {
-    width: 0 !important;
-    border-right-width: 0px;
-    transform: translateX(-100%); /* Untuk mobile */
-}
-
-/* Di desktop, biarkan transisi lebar saja */
-@media (min-width: 768px) {
-    #sidebar.w-0 {
-        transform: translateX(0); 
-    }
-}
-
-/* Supaya konten di dalam sidebar tidak "patah" saat animasi menyempit */
-#sidebar div.min-w-\[256px\] {
-    transition: opacity 0.2s;
-}
-
-#sidebar.w-0 div.min-w-\[256px\] {
-    opacity: 0;
-}
+/* Modal */
+.modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000; }
+.modal-overlay.active { display: flex; }
+.modal-box { background: white; padding: 25px; border-radius: 8px; width: 400px; max-width: 90%; text-align: center; animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+@keyframes popIn { from { transform: scale(0.8); } to { transform: scale(1); } }
+.modal-success-icon { font-size: 50px; color: var(--success); margin-bottom: 15px; }

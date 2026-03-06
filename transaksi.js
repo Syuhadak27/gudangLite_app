@@ -1,101 +1,141 @@
-// --- LOGIKA TRANSAKSI (Update Stok Otomatis) ---
+let txData = [];
 
-async function saveTransaksi() {
-    const barangId = document.getElementById('txBarangId').value; // ID gabungan Nama-Supplier
-    const tipe = document.getElementById('txTipe').value; // "Masuk" atau "Keluar"
-    const jumlah = parseInt(document.getElementById('txJumlah').value);
-
-    if (!barangId || !jumlah) return alert("Data tidak lengkap!");
-
-    const tx = db.transaction(["inventory", "transaksi"], "readwrite");
-    const invStore = tx.objectStore("inventory");
-    const traStore = tx.objectStore("transaksi");
-
-    // 1. Ambil data barang asli
-    const item = await new Promise(res => {
-        invStore.get(barangId).onsuccess = (e) => res(e.target.result);
+const loadTransaksi = async () => {
+    txData = await dbGetAll('transaksi');
+    const tbody = document.getElementById('tbody-transaksi');
+    tbody.innerHTML = '';
+    
+    txData.slice().reverse().forEach(tx => { // Tampilkan yg terbaru di atas
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td>${new Date(tx.timestamp).toLocaleString('id-ID')}</td>
+            <td>${tx.nama || '-'}</td>       <td>${tx.supplier || '-'}</td>   <td style="color:${tx.tipe === 'masuk' ? 'green' : 'red'}">${tx.tipe.toUpperCase()}</td>
+            <td>${tx.qty}</td>
+            <td>
+                <button class="btn btn-secondary" onclick="editTransaksi(${tx.tx_id}, '${tx.inv_id}', ${tx.qty}, '${tx.tipe}')">Edit</button>
+                <button class="btn btn-danger" onclick="deleteTransaksi(${tx.tx_id}, '${tx.inv_id}', '${tx.tipe}', ${tx.qty})">Hapus</button>
+            </td>
+        `;
+        tbody.appendChild(tr);
     });
+};
 
-    if (!item) return alert("Barang tidak ditemukan!");
+const generateDatalist = async () => {
+    const invData = await dbGetAll('inventory');
+    // Membuat HTML datalist
+    const options = invData.map(i => `<option value="${i.id}">${i.nama} - ${i.supplier}</option>`).join('');
+    return `<datalist id="list-barang">${options}</datalist>`;
+};
 
-    // 2. Hitung Stok Baru
-    // Rumus: Masuk menambah (+), Keluar mengurangi (-)
-    if (tipe === "Masuk") {
-        item.stok += jumlah;
-    } else {
-        if (item.stok < jumlah) return alert("Stok tidak mencukupi!");
-        item.stok -= jumlah;
-    }
+// Contoh pada Transaksi:
+document.getElementById('btn-add-tx').addEventListener('click', async () => {
+    const datalist = await generateDatalist();
+    showModal(`
+        <h3>Input Transaksi</h3>
+        ${datalist}
+        <input list="list-barang" id="tx-inv-id" placeholder="Ketik nama barang..." style="width:100%; padding:8px;">
+        <select id="tx-tipe" class="mt-2" style="width:100%; padding:8px;">
+            <option value="masuk">Barang Masuk</option>
+            <option value="keluar">Barang Keluar</option>
+        </select>
+        <input type="number" id="tx-qty" placeholder="Jumlah" class="mt-2" style="width:100%; padding:8px;">
+        <button class="btn btn-primary mt-2" onclick="saveTransaksi()">Simpan</button>
+        <button class="btn btn-secondary mt-2" onclick="closeModal()">Batal</button>
+    `);
+});
 
-    // 3. Simpan perubahan ke kedua tabel
-    invStore.put(item);
-    traStore.add({
-        barangId: barangId,
-        tipe: tipe,
-        jumlah: jumlah,
-        waktu: new Date().toLocaleString()
-    });
+const saveTransaksi = async () => {
+    const fullId = document.getElementById('tx-inv-id').value; // Contoh: "Sabun_Wings"
+    const tipe = document.getElementById('tx-tipe').value;
+    const qty = parseInt(document.getElementById('tx-qty').value);
+    
+    // Pisahkan nama dan supplier dari ID (asumsi format ID adalah "nama_supplier")
+    const parts = fullId.split('_');
+    const nama = parts[0];
+    const supplier = parts[1] || 'Tanpa Supplier';
 
-    tx.oncomplete = () => {
-        showSuccess();
-        closeModal();
-        loadInventory();
-        loadTransaksi();
-    };
-}
+    const txDB = db.transaction(['inventory', 'transaksi'], 'readwrite');
+    const invStore = txDB.objectStore('inventory');
+    
+    const invReq = invStore.get(fullId);
+    invReq.onsuccess = () => {
+        const item = invReq.result;
+        if (tipe === 'masuk') item.stok += qty;
+        else item.stok -= qty;
 
-async function loadTransaksi() {
-    const tx = db.transaction("transaksi", "readonly");
-    const store = tx.objectStore("transaksi");
-    const body = document.getElementById('transaksiBody');
-    body.innerHTML = "";
-
-    store.getAll().onsuccess = (e) => {
-        const data = e.target.result.reverse(); // Transaksi terbaru di atas
-        data.forEach(t => {
-            const row = `
-                <tr class="hover:bg-gray-50 text-sm">
-                    <td class="p-3 border">${t.barangId}</td>
-                    <td class="p-3 border">
-                        <span class="px-2 py-1 rounded text-xs ${t.tipe === 'Masuk' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}">
-                            ${t.tipe}
-                        </span>
-                    </td>
-                    <td class="p-3 border font-bold">${t.jumlah}</td>
-                    <td class="p-3 border text-gray-500 text-xs">${t.waktu}</td>
-                    <td class="p-3 border">
-                        <button onclick="deleteTransaksi(${t.id}, '${t.barangId}', '${t.tipe}', ${t.jumlah})" class="text-red-400 hover:text-red-600">
-                            <i class="fas fa-undo"></i> Batal
-                        </button>
-                    </td>
-                </tr>
-            `;
-            body.insertAdjacentHTML('beforeend', row);
+        invStore.put(item);
+        txDB.objectStore('transaksi').add({ 
+            inv_id: fullId, 
+            nama: nama,          // <--- Tambahkan field baru
+            supplier: supplier,  // <--- Tambahkan field baru
+            tipe: tipe, 
+            qty: qty, 
+            timestamp: Date.now() 
         });
     };
-}
 
-async function deleteTransaksi(id, barangId, tipe, jumlah) {
-    if (!confirm("Batalkan transaksi ini? Stok akan dikembalikan.")) return;
+    txDB.oncomplete = () => {
+        loadTransaksi();
+        loadInventory(); // Refresh memori stok
+        showSuccessModal("Transaksi berhasil dicatat!");
+    };
+};
 
-    const tx = db.transaction(["inventory", "transaksi"], "readwrite");
-    const invStore = tx.objectStore("inventory");
+window.deleteTransaksi = (tx_id, inv_id, tipe, qty) => {
+    // Revert stok sebelum hapus
+    const txDB = db.transaction(['inventory', 'transaksi'], 'readwrite');
+    const invStore = txDB.objectStore('inventory');
     
-    // Kembalikan stok (logika terbalik)
-    const item = await new Promise(res => {
-        invStore.get(barangId).onsuccess = (e) => res(e.target.result);
-    });
+    const invReq = invStore.get(inv_id);
+    invReq.onsuccess = () => {
+        if(invReq.result) {
+            const item = invReq.result;
+            // Kembalikan kebalikannya
+            if (tipe === 'masuk') item.stok -= qty;
+            else item.stok += qty;
+            invStore.put(item);
+        }
+        txDB.objectStore('transaksi').delete(tx_id);
+    };
 
-    if (item) {
-        if (tipe === "Masuk") item.stok -= jumlah;
-        else item.stok += jumlah;
-        invStore.put(item);
-    }
-
-    tx.objectStore("transaksi").delete(id);
-    tx.oncomplete = () => {
-        showSuccess();
+    txDB.oncomplete = () => {
         loadTransaksi();
         loadInventory();
+        showSuccessModal("Transaksi dibatalkan & stok dikembalikan.");
     };
-}
+};
+
+// Tambahkan fungsi ini
+window.editTransaksi = async (tx_id, inv_id, oldQty, tipe) => {
+    showModal(`
+        <h3>Edit Jumlah Transaksi</h3>
+        <input type="number" id="edit-qty" value="${oldQty}" class="mt-2" style="width:100%; padding:8px;">
+        <button class="btn btn-primary mt-2" onclick="confirmEditTx(${tx_id}, '${inv_id}', ${oldQty}, '${tipe}')">Update</button>
+    `);
+};
+
+window.confirmEditTx = async (tx_id, inv_id, oldQty, tipe) => {
+    const newQty = parseInt(document.getElementById('edit-qty').value);
+    const selisih = newQty - oldQty;
+
+    const txDB = db.transaction(['inventory', 'transaksi'], 'readwrite');
+    const invStore = txDB.objectStore('inventory');
+    
+    const invReq = invStore.get(inv_id);
+    invReq.onsuccess = () => {
+        const item = invReq.result;
+        // Jika Masuk: stok = stok + selisih
+        // Jika Keluar: stok = stok - selisih
+        if (tipe === 'masuk') item.stok += selisih;
+        else item.stok -= selisih;
+        
+        invStore.put(item);
+        txDB.objectStore('transaksi').put({ tx_id, inv_id, tipe, qty: newQty, timestamp: Date.now() });
+    };
+
+    txDB.oncomplete = () => {
+        loadTransaksi();
+        loadInventory();
+        showSuccessModal("Transaksi diupdate!");
+    };
+};
