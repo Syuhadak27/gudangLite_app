@@ -1,0 +1,81 @@
+body { font-family: 'Inter', sans-serif; }
+.nav-link.active { background: #3b82f6; color: white; box-shadow: 0 4px 12px rgba(59,130,246,0.3); }
+.nav-link:not(.active):hover { background: #f1f5f9; color: #3b82f6; }
+.suggestion-box { position: absolute; width: 100%; max-height: 200px; overflow-y: auto; background: white; border: 1px solid #e2e8f0; border-radius: 8px; z-index: 100; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+
+/* Sidebar Animation */
+#sidebar {
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Nav Link Styling */
+.nav-link.active {
+    background: #3b82f6;
+    color: white;
+    box-shadow: 0 10px 20px -5px rgba(59, 130, 246, 0.4);
+}
+
+.nav-link:not(.active):hover {
+    background: #f8fafc;
+    color: #3b82f6;
+}
+
+/* Modal Overlay Blur */
+#modalOverlay {
+    transition: all 0.3s ease;
+}
+
+/* Suggestion Box */
+.suggestion-box {
+    position: absolute;
+    width: 100%;
+    max-height: 200px;
+    overflow-y: auto;
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 1rem;
+    z-index: 100;
+    margin-top: 6px;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
+
+/* Success Animation */
+#successOverlay i {
+    animation: scaleCheck 0.5s ease-out;
+}
+
+@keyframes scaleCheck {
+    0% { transform: scale(0); opacity: 0; }
+    70% { transform: scale(1.2); }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+
+/* Pastikan sidebar bisa benar-benar sembunyi */
+#sidebar.w-0 {
+    width: 0 !important;
+    border-right-width: 0px;
+    transform: translateX(-100%); /* Untuk mobile */
+}
+
+/* Di desktop, biarkan transisi lebar saja */
+@media (min-width: 768px) {
+    #sidebar.w-0 {
+        transform: translateX(0); 
+    }
+}
+
+/* Supaya konten di dalam sidebar tidak "patah" saat animasi menyempit */
+#sidebar div.min-w-\[256px\] {
+    transition: opacity 0.2s;
+}
+
+#sidebar.w-0 div.min-w-\[256px\] {
+    opacity: 0;
+}
