@@ -37,6 +37,7 @@ async function importJSON() {
             document.getElementById('progressContainer').classList.add('hidden');
             showSuccess();
             loadInventory();
+            DatabaseAnalytics.updateSidebarIndicator(); // <--- TAMBAHKAN INI
         };
     };
     reader.readAsText(file);

@@ -64,6 +64,7 @@ async function submitProduct() {
         showSuccess(); // Animasi centang ijo
         closeModal();
         loadInventory(); // Refresh tabel agar data baru muncul
+        DatabaseAnalytics.updateSidebarIndicator(); // <--- TAMBAHKAN INI
     };
 
     request.onerror = () => {

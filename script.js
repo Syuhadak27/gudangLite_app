@@ -15,6 +15,7 @@ request.onupgradeneeded = (e) => {
 request.onsuccess = (e) => {
     db = e.target.result;
     loadInventory();
+    DatabaseAnalytics.updateSidebarIndicator(); // <--- TAMBAHKAN INI
 };
 
 // --- NAVIGATION & UI ---
@@ -114,6 +115,7 @@ function confirmReset() {
         tx.oncomplete = () => {
             showSuccess();
             loadInventory();
+            DatabaseAnalytics.updateSidebarIndicator(); // <--- TAMBAHKAN INI
         };
     } else {
         alert("Password Salah!");
@@ -268,5 +270,6 @@ async function saveEdit(oldId) {
         showSuccess();
         closeModal();
         loadInventory(); // Refresh full untuk re-sync cache
+        DatabaseAnalytics.updateSidebarIndicator(); // <--- TAMBAHKAN INI
     };
 }
