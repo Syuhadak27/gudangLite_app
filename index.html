@@ -1,139 +1,316 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GudangLite - Offline System</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
-        .sidebar-transition { transition: all 0.3s ease; }
-        .hidden-sidebar { transform: translateX(-100%); width: 0; overflow: hidden; }
-        #toast { visibility: hidden; min-width: 250px; margin-left: -125px; background-color: #333; color: #fff; text-align: center; border-radius: 8px; padding: 16px; position: fixed; z-index: 100; left: 50%; bottom: 30px; }
-        #toast.show { visibility: visible; animation: fadein 0.5s, fadeout 0.5s 2.5s; }
-        @keyframes fadein { from {bottom: 0; opacity: 0;} to {bottom: 30px; opacity: 1;} }
-        @keyframes fadeout { from {bottom: 30px; opacity: 1;} to {bottom: 0; opacity: 0;} }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GudangLite - Offline System</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+  <style>
+    .sidebar-transition { transition: all 0.3s ease; }
+    .hidden-sidebar { transform: translateX(-100%); width: 0; overflow: hidden; }
+
+    #toast {
+      visibility: hidden;
+      min-width: 250px;
+      margin-left: -125px;
+      background-color: #333;
+      color: #fff;
+      text-align: center;
+      border-radius: 8px;
+      padding: 16px;
+      position: fixed;
+      z-index: 100;
+      left: 50%;
+      bottom: 30px;
+    }
+
+    #toast.show {
+      visibility: visible;
+      animation: fadein 0.5s, fadeout 0.5s 2.5s;
+    }
+
+    @keyframes fadein {
+      from { bottom: 0; opacity: 0; }
+      to { bottom: 30px; opacity: 1; }
+    }
+
+    @keyframes fadeout {
+      from { bottom: 30px; opacity: 1; }
+      to { bottom: 0; opacity: 0; }
+    }
+  </style>
 </head>
+
 <body class="bg-gray-100 font-sans">
 
-    <div class="flex h-screen overflow-hidden">
-        <aside id="sidebar" class="bg-slate-800 text-white w-64 flex-shrink-0 transition-all flex flex-col h-screen">
+<div class="flex h-screen overflow-hidden">
+
+  <!-- SIDEBAR -->
+  <aside id="sidebar" class="bg-slate-800 text-white w-64 flex-shrink-0 flex flex-col h-screen">
+
     <div class="p-6 border-b border-slate-700">
-        <div class="text-xl font-bold">GudangLite v1.0</div>
-        <div class="mt-3 flex items-center justify-between text-[10px] text-slate-400 bg-slate-900 px-3 py-1 rounded">
-            <span>DB Size:</span>
-            <span id="dbSizeIndicator" class="font-mono text-emerald-400 font-bold">0.00 MB</span>
-        </div>
+      <div class="text-xl font-bold">GudangLite v1.0</div>
+
+      <div class="mt-3 flex items-center justify-between text-[10px] text-slate-400 bg-slate-900 px-3 py-1 rounded">
+        <span>DB Size:</span>
+        <span id="dbSizeIndicator" class="font-mono text-emerald-400 font-bold">0.00 MB</span>
+      </div>
     </div>
-    
+
     <nav class="mt-6 flex-1">
-        <button onclick="showSection('dashboard')" class="w-full text-left py-3 px-6 hover:bg-slate-700"><i class="fas fa-home mr-3"></i> Dashboard</button>
-        <button onclick="showSection('inventory')" class="w-full text-left py-3 px-6 hover:bg-slate-700"><i class="fas fa-boxes mr-3"></i> Inventory</button>
-        <button onclick="showSection('transaksi')" class="w-full text-left py-3 px-6 hover:bg-slate-700"><i class="fas fa-exchange-alt mr-3"></i> Transaksi</button>
+
+      <button onclick="showSection('dashboard')" class="w-full text-left py-3 px-6 hover:bg-slate-700">
+        <i class="fas fa-home mr-3"></i> Dashboard
+      </button>
+
+      <button onclick="showSection('inventory')" class="w-full text-left py-3 px-6 hover:bg-slate-700">
+        <i class="fas fa-boxes mr-3"></i> Inventory
+      </button>
+
+      <button onclick="showSection('transaksi')" class="w-full text-left py-3 px-6 hover:bg-slate-700">
+        <i class="fas fa-exchange-alt mr-3"></i> Transaksi
+      </button>
     </nav>
-</aside>
+  </aside>
 
+  <!-- MAIN -->
+  <main class="flex-1 flex flex-col overflow-hidden">
 
-        <main class="flex-1 flex flex-col overflow-hidden">
-            <header class="bg-white shadow-sm p-4 flex items-center justify-between">
-                <button onclick="toggleSidebar()" class="text-slate-800 text-xl"><i class="fas fa-bars"></i></button>
-                <h2 id="section-title" class="text-xl font-semibold">Dashboard</h2>
-                <div class="text-sm text-gray-500"><i class="fas fa-wifi-slash"></i> Offline Mode</div>
-            </header>
+    <!-- HEADER -->
+    <header class="bg-white shadow-sm p-4 flex items-center justify-between">
+      <button onclick="toggleSidebar()" class="text-slate-800 text-xl">
+        <i class="fas fa-bars"></i>
+      </button>
 
-            <div class="p-6 overflow-y-auto h-full">
-                <section id="dashboard" class="space-y-6">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div class="bg-white p-6 rounded-lg shadow-md border-t-4 border-blue-500">
-                            <h3 class="font-bold mb-4">Import Data (JSON)</h3>
-                            <input type="file" id="importFile" accept=".json" class="block w-full text-sm text-gray-500 mb-4 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
-                            <button onclick="importJSON()" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Mulai Import</button>
-                        </div>
-                        <div class="bg-white p-6 rounded-lg shadow-md border-t-4 border-green-500">
-                            <h3 class="font-bold mb-4">Export Data</h3>
-                            <p class="text-gray-600 mb-4">Backup semua data ke format JSON.</p>
-                            <button onclick="exportJSON()" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Download Backup</button>
-                        </div>
-                    </div>
-                    <div id="progressContainer" class="hidden">
-                        <p id="progressText" class="mb-2 font-semibold text-blue-700 text-sm">Processing...</p>
-                        <div class="w-full bg-gray-200 rounded-full h-2.5">
-                            <div id="progressBar" class="bg-blue-600 h-2.5 rounded-full" style="width: 0%"></div>
-                        </div>
-                    </div>
-                </section>
+      <h2 id="section-title" class="text-xl font-semibold">Dashboard</h2>
 
-                <section id="inventory" class="hidden space-y-4">
-                    <div class="flex flex-wrap gap-4 justify-between items-center">
-                        <div class="flex gap-2">
-                            <input type="text" id="searchInput" placeholder="Cari minimal 3 karakter..." class="border p-2 rounded w-64" onkeyup="handleSearch(this.value)">
-                            <select id="sortFilter" class="border p-2 rounded" onchange="loadInventory()">
-                                <option value="az">Nama A-Z</option>
-                                <option value="za">Nama Z-A</option>
-                            </select>
-                        </div>
-                        <div class="flex gap-2">
-                            <button onclick="openAddProduct()" class="bg-indigo-600 text-white px-4 py-2 rounded">
-    <i class="fas fa-plus"></i> Tambah
-</button>
-                            <button onclick="confirmReset()" class="bg-red-500 text-white px-4 py-2 rounded"><i class="fas fa-trash"></i> Reset All</button>
-                        </div>
-                    </div>
-                    <div class="bg-white rounded-lg shadow overflow-x-auto">
-                        <table class="w-full text-left border-collapse">
-                            <thead class="bg-gray-50">
-                                <tr>
-                                    <th class="p-3 border">Nama & Supplier</th>
-                                    <th class="p-3 border">Stok</th>
-                                    <th class="p-3 border">Barcode</th>
-                                    <th class="p-3 border">Harga Jual</th>
-                                    <th class="p-3 border">Aksi</th>
-                                </tr>
-                            </thead>
-                            <tbody id="inventoryBody"></tbody>
-                        </table>
-                    </div>
-                </section>
+      <div class="text-sm text-gray-500">
+        <i class="fas fa-wifi-slash"></i> Offline Mode
+      </div>
+    </header>
 
-                <section id="transaksi" class="hidden space-y-4">
-                    <button onclick="openModal('modalTransaksi')" class="bg-orange-500 text-white px-4 py-2 rounded"><i class="fas fa-plus"></i> Transaksi Baru</button>
-                    <div class="bg-white rounded-lg shadow overflow-x-auto">
-                        <table class="w-full text-left border-collapse">
-                            <thead class="bg-gray-50">
-                                <tr>
-                                    <th class="p-3 border">Barang (ID)</th>
-                                    <th class="p-3 border">Tipe</th>
-                                    <th class="p-3 border">Jumlah</th>
-                                    <th class="p-3 border">Waktu</th>
-                                    <th class="p-3 border">Aksi</th>
-                                </tr>
-                            </thead>
-                            <tbody id="transaksiBody"></tbody>
-                        </table>
-                    </div>
-                </section>
-            </div>
-        </main>
-    </div>
+    <!-- CONTENT -->
+    <div class="p-6 overflow-y-auto h-full">
 
-    <div id="globalModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <div class="bg-white p-6 rounded-lg w-96 shadow-xl" id="modalContent"></div>
-    </div>
+      <!-- DASHBOARD -->
+      <section id="dashboard" class="space-y-6">
 
-    <div id="successModal" class="hidden fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-[100]">
-        <div class="bg-white p-8 rounded-full flex flex-col items-center">
-            <i class="fas fa-check-circle text-green-500 text-7xl animate-bounce"></i>
-            <p class="mt-4 font-bold">Berhasil!</p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+          <!-- IMPORT -->
+          <div class="bg-white p-6 rounded-lg shadow-md border-t-4 border-blue-500">
+            <h3 class="font-bold mb-4">Import Data (JSON)</h3>
+
+            <input
+              type="file"
+              id="importFile"
+              accept=".json"
+              class="block w-full text-sm text-gray-500 mb-4
+              file:mr-4 file:py-2 file:px-4 file:rounded-full
+              file:border-0 file:text-sm file:font-semibold
+              file:bg-blue-50 file:text-blue-700
+              hover:file:bg-blue-100"
+            >
+
+            <button onclick="importJSON()" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+              Mulai Import
+            </button>
+          </div>
+
+          <!-- EXPORT -->
+          <div class="bg-white p-6 rounded-lg shadow-md border-t-4 border-green-500">
+            <h3 class="font-bold mb-4">Export Data</h3>
+            <p class="text-gray-600 mb-4">Backup semua data ke format JSON.</p>
+
+            <button onclick="exportJSON()" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
+              Download Backup
+            </button>
+          </div>
+
         </div>
+
+        <!-- DASHBOARD CARDS -->
+        <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 flex items-center gap-5 hover:shadow-md hover:-translate-y-1 transition-all">
+          <div class="w-14 h-14 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center text-2xl">
+            <i class="fas fa-boxes"></i>
+          </div>
+
+          <div>
+            <div class="text-slate-400 text-[10px] font-bold uppercase tracking-widest">
+              Total Produk
+            </div>
+
+            <div id="dash-total-produk" class="text-3xl font-black text-slate-800 tracking-tight">
+              0
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 flex items-center gap-5 border-l-4 border-l-emerald-500 hover:shadow-md hover:-translate-y-1 transition-all">
+          <div class="w-14 h-14 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center text-2xl">
+            <i class="fas fa-arrow-down"></i>
+          </div>
+
+          <div>
+            <div class="text-slate-400 text-[10px] font-bold uppercase tracking-widest">
+              Masuk (Hari Ini)
+            </div>
+
+            <div id="dash-masuk-today" class="text-3xl font-black text-slate-800 tracking-tight">
+              0
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 flex items-center gap-5 border-l-4 border-l-rose-500 hover:shadow-md hover:-translate-y-1 transition-all">
+          <div class="w-14 h-14 bg-rose-50 text-rose-600 rounded-2xl flex items-center justify-center text-2xl">
+            <i class="fas fa-arrow-up"></i>
+          </div>
+
+          <div>
+            <div class="text-slate-400 text-[10px] font-bold uppercase tracking-widest">
+              Keluar (Hari Ini)
+            </div>
+
+            <div id="dash-keluar-today" class="text-3xl font-black text-slate-800 tracking-tight">
+              0
+            </div>
+          </div>
+        </div>
+
+        <!-- PROGRESS -->
+        <div id="progressContainer" class="hidden">
+
+          <p id="progressText" class="mb-2 font-semibold text-blue-700 text-sm">
+            Processing...
+          </p>
+
+          <div class="w-full bg-gray-200 rounded-full h-2.5">
+            <div id="progressBar" class="bg-blue-600 h-2.5 rounded-full" style="width:0%"></div>
+          </div>
+
+        </div>
+
+      </section>
+
+      <!-- INVENTORY -->
+      <section id="inventory" class="hidden space-y-4">
+
+        <div class="flex flex-wrap gap-4 justify-between items-center">
+
+          <div class="flex gap-2">
+            <input
+              type="text"
+              id="searchInput"
+              placeholder="Cari minimal 3 karakter..."
+              class="border p-2 rounded w-64"
+              onkeyup="handleSearch(this.value)"
+            >
+
+            <select id="sortFilter" class="border p-2 rounded" onchange="loadInventory()">
+              <option value="az">Nama A-Z</option>
+              <option value="za">Nama Z-A</option>
+            </select>
+          </div>
+
+          <div class="flex gap-2">
+
+            <button onclick="openAddProduct()" class="bg-indigo-600 text-white px-4 py-2 rounded">
+              <i class="fas fa-plus"></i> Tambah
+            </button>
+
+            <button onclick="confirmReset()" class="bg-red-500 text-white px-4 py-2 rounded">
+              <i class="fas fa-trash"></i> Reset All
+            </button>
+
+          </div>
+
+        </div>
+
+        <div class="bg-white rounded-lg shadow overflow-x-auto">
+
+          <table class="w-full text-left border-collapse">
+
+            <thead class="bg-gray-50">
+              <tr>
+                <th class="p-3 border">Nama & Supplier</th>
+                <th class="p-3 border">Stok</th>
+                <th class="p-3 border">Barcode</th>
+                <th class="p-3 border">Harga Jual</th>
+                <th class="p-3 border">Aksi</th>
+              </tr>
+            </thead>
+
+            <tbody id="inventoryBody"></tbody>
+
+          </table>
+
+        </div>
+
+      </section>
+
+      <!-- TRANSAKSI -->
+      <section id="transaksi" class="hidden space-y-4">
+
+        <button onclick="openModal('modalTransaksi')" class="bg-orange-500 text-white px-4 py-2 rounded">
+          <i class="fas fa-plus"></i> Transaksi Baru
+        </button>
+
+        <div class="bg-white rounded-lg shadow overflow-x-auto">
+
+          <table class="w-full text-left border-collapse">
+
+            <thead class="bg-gray-50">
+              <tr>
+                <th class="p-3 border">Barang (ID)</th>
+                <th class="p-3 border">Tipe</th>
+                <th class="p-3 border">Jumlah</th>
+                <th class="p-3 border">Waktu</th>
+                <th class="p-3 border">Aksi</th>
+              </tr>
+            </thead>
+
+            <tbody id="transaksiBody"></tbody>
+
+          </table>
+
+        </div>
+
+      </section>
+
     </div>
 
-    <div id="toast">Notifikasi</div>
+  </main>
 
-    <script src="script.js"></script>
-    <script src="json.js"></script>
-    <script src="customize.js"></script>    
-    <script src="tambah_barang.js"></script>
-    <script src="transaksi.js"></script>
+</div>
+
+<!-- MODAL -->
+<div id="globalModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+  <div id="modalContent" class="bg-white p-6 rounded-lg w-96 shadow-xl"></div>
+</div>
+
+<!-- SUCCESS -->
+<div id="successModal" class="hidden fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-[100]">
+  <div class="bg-white p-8 rounded-full flex flex-col items-center">
+    <i class="fas fa-check-circle text-green-500 text-7xl animate-bounce"></i>
+    <p class="mt-4 font-bold">Berhasil!</p>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast">Notifikasi</div>
+
+<!-- SCRIPT -->
+<script src="script.js"></script>
+<script src="dashboard_stats.js"></script>
+<script src="json.js"></script>
+<script src="customize.js"></script>
+<script src="tambah_barang.js"></script>
+
+<script src="transaksi.js"></script>
+
 </body>
 </html>

@@ -16,6 +16,7 @@ request.onsuccess = (e) => {
     db = e.target.result;
     loadInventory();
     DatabaseAnalytics.updateSidebarIndicator(); // <--- TAMBAHKAN INI
+    updateDashboardStats();
 };
 
 // --- NAVIGATION & UI ---
@@ -24,14 +25,40 @@ function toggleSidebar() {
 }
 
 function showSection(sectionId) {
-    ['dashboard', 'inventory', 'transaksi'].forEach(s => {
-        document.getElementById(s).classList.add('hidden');
+    // 1. Sembunyikan semua section yang terdaftar
+    ['dashboard', 'inventory', 'transaksi', 'order'].forEach(s => {
+        const el = document.getElementById(s);
+        if (el) el.classList.add('hidden');
     });
-    document.getElementById(sectionId).classList.remove('hidden');
-    document.getElementById('section-title').innerText = sectionId.charAt(0).toUpperCase() + sectionId.slice(1);
+
+    // 2. Tampilkan section yang dipilih oleh user
+    const targetEl = document.getElementById(sectionId);
+    if (targetEl) targetEl.classList.remove('hidden');
     
-    if (sectionId === 'inventory') loadInventory();
-    if (sectionId === 'transaksi') loadTransaksi();
+    // Update Judul di Header
+    const titleEl = document.getElementById('section-title');
+    if (titleEl) {
+        titleEl.innerText = sectionId.charAt(0).toUpperCase() + sectionId.slice(1);
+    }
+    
+    // 3. Logika Inisialisasi Konten Spesifik
+    if (sectionId === 'dashboard') {
+        // Memanggil fungsi hitung statistik (Produk & Transaksi Hari Ini)
+        updateDashboardStats(); 
+        // Memastikan indikator ukuran database di sidebar juga terupdate
+        DatabaseAnalytics.updateSidebarIndicator();
+    } 
+    
+    else if (sectionId === 'inventory') {
+        loadInventory();
+    } 
+    
+    else if (sectionId === 'transaksi') {
+        loadTransaksi();
+    } 
+    else if (sectionId === 'order') {
+        renderOrder();
+    }
 }
 
 // --- UTILS ---
@@ -116,6 +143,7 @@ function confirmReset() {
             showSuccess();
             loadInventory();
             DatabaseAnalytics.updateSidebarIndicator(); // <--- TAMBAHKAN INI
+            updateDashboardStats();
         };
     } else {
         alert("Password Salah!");
@@ -271,5 +299,6 @@ async function saveEdit(oldId) {
         closeModal();
         loadInventory(); // Refresh full untuk re-sync cache
         DatabaseAnalytics.updateSidebarIndicator(); // <--- TAMBAHKAN INI
+        updateDashboardStats();
     };
 }
