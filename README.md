@@ -1,69 +1,43 @@
+# 📦 GudangKu: Offline-First Inventory Management
 
-# 📦 GudangLite - Offline Inventory System
+[![Status](https://img.shields.io/badge/status-active-brightgreen.svg)]()
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+[![Tailwind CSS](https://img.shields.io/badge/UI-Tailwind_CSS-38B2AC?logo=tailwind-css)]()
 
-<p align="center">
-  <img src="https://img.shields.io/badge/Status-Stable-brightgreen" alt="Status">
-  <img src="https://img.shields.io/badge/Tech-IndexedDB-orange" alt="IndexedDB">
-  <img src="https://img.shields.io/badge/Frontend-VanillaJS-yellow" alt="JS">
-  <img src="https://img.shields.io/badge/UI-TailwindCSS-blue" alt="Tailwind">
-</p>
-
-**GudangLite** adalah sistem manajemen gudang berbasis web yang dirancang untuk performa tinggi dalam mode **100% Offline**. Aplikasi ini memanfaatkan **IndexedDB** sebagai mesin penyimpanan lokal, memungkinkan Anda menangani hingga **10.000+ baris data** tanpa ketergantungan pada server atau internet.
-
----
-
-## 🚀 Fitur Utama
-
-- **Offline-First Engine:** Semua data tersimpan aman di browser user menggunakan IndexedDB.
-- **High Performance (10k+ Data):** Optimasi *in-memory caching* untuk pencarian dan filter instan tanpa *lag*.
-- **Smart Inventory:** - Penambahan barang baru dengan validasi ID unik (Nama + Supplier).
-  - Sistem filter multi-supplier yang rapi.
-  - Perhitungan stok otomatis (Masuk/Keluar).
-- **Import/Export:** Integrasi data JSON dengan progress bar visual yang informatif.
-- **Modern UI:** Antarmuka responsif dengan sidebar yang dapat disembunyikan dan sistem modal yang elegan.
-
----
-
-## 🛠️ Arsitektur Data
-
-Kami menggunakan IndexedDB untuk memastikan integritas data tetap terjaga meskipun aplikasi dijalankan di perangkat dengan sumber daya terbatas.
+**GudangKu** adalah aplikasi manajemen gudang modern yang dirancang untuk kecepatan dan kemudahan akses. Dibangun dengan pendekatan *Offline-First*, aplikasi ini memastikan data operasional Anda tetap aman di browser tanpa bergantung sepenuhnya pada koneksi internet.
 
 
 
----
+## 🔥 Fitur Unggulan
 
-## ⚙️ Handling 10,000+ Baris Data
+- **🚀 Performa Instan:** Menggunakan IndexedDB untuk penyimpanan lokal, data termuat tanpa *loading* server yang lama.
+- **🔐 Akses Terproteksi:** Sistem login sederhana untuk menjaga integritas dashboard dari akses tidak sah.
+- **📊 Dashboard Dinamis:** Pantau total produk, transaksi masuk, dan keluar dalam satu tampilan ringkas.
+- **🛠 Manajemen Stok:**
+  - Tambah & Edit produk dengan UI yang intuitif.
+  - Pencarian barang super cepat (Auto-suggest).
+  - Fitur Hapus Massal dengan konfirmasi keamanan.
+- **📝 Riwayat Transaksi:** Pencatatan otomatis untuk setiap pergerakan barang (In/Out).
+- **📋 Stok Opname:** Modul khusus untuk sinkronisasi data fisik dengan sistem secara akurat.
+- **💾 Export/Import JSON:** Backup dan restore data lokal Anda kapan saja dengan satu klik.
 
-Untuk memastikan performa tetap ringan meski data berukuran besar, GudangLite menerapkan strategi berikut:
+## 🚀 Cara Penggunaan
 
-| Teknik | Penjelasan |
-| :--- | :--- |
-| **IndexedDB Storage** | Menyimpan data mentah di penyimpanan lokal browser untuk kecepatan baca/tulis. |
-| **In-Memory Caching** | Memuat data ke `Array` JS saat startup untuk pencarian/filter secepat kilat. |
-| **Virtual Rendering** | Membatasi jumlah DOM yang dirender secara bersamaan untuk mencegah *browser freeze*. |
-| **Atomic Transactions** | Memastikan sinkronisasi stok dan transaksi selalu konsisten (All-or-Nothing). |
+1. **Persiapan:**
+   - Clone repositori ini ke komputer Anda.
+   - Buka `index.html` menggunakan *Live Server* di VS Code atau browser favorit Anda.
+2. **Login Pertama:**
+   - **Username:** `admin`
+   - **Password:** `admin`
+3. **Mulai Mengelola:**
+   - Tambahkan produk pertama Anda di tab **Inventory**.
+   - Lakukan transaksi masuk/keluar di tab **Transaksi**.
+   - Cek ukuran database Anda secara *real-time* di sidebar.
 
 
+
+## 🛡 Keamanan & Privasi
+Data Anda disimpan sepenuhnya di dalam perangkat Anda sendiri (Client-side). Aplikasi ini sangat cocok bagi UMKM atau operasional gudang yang membutuhkan privasi data tinggi dan mobilitas tanpa gangguan sinyal internet.
 
 ---
-
-## 🚀 Cara Instalasi
-
-**Buka di Browser:**
-Karena aplikasi ini menggunakan `IndexedDB` dan modul browser, pastikan Anda menjalankannya melalui *Local Server* (seperti Live Server di VS Code) agar fitur *file import/export* berjalan dengan izin yang benar.
-
----
-
-## 🔐 Keamanan & Reset
-
-Aplikasi dilengkapi dengan fitur proteksi **Admin Password** untuk tindakan sensitif seperti menghapus seluruh database (`Reset All`).
-
----
-
-
-
-<p align="center">Built with ❤️ for High-Performance Offline Management</p>
-
-```
-
------
+*Dikembangkan dengan ❤️ menggunakan Tailwind CSS dan IndexedDB.*
