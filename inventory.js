@@ -105,6 +105,7 @@ window.editInventory = (id) => {
 };
 
 // FITUR HAPUS
+// FITUR HAPUS (KOREKSI)
 window.deleteInventory = (id) => {
     showModal(`
         <h3>Hapus Barang?</h3>
@@ -113,12 +114,17 @@ window.deleteInventory = (id) => {
         <button class="btn btn-secondary mt-2" onclick="closeModal()">Batal</button>
     `);
 };
+
 window.confirmDeleteInv = (id) => {
     const request = db.transaction('inventory', 'readwrite').objectStore('inventory').delete(id);
     request.onsuccess = () => {
         loadInventory();
         updateDbSize();
-        showSuccessModal("Barang dihapus!");
+        closeModal(); // Pastikan modal tertutup setelah hapus
+        showSuccessModal("Barang berhasil dihapus!");
+    };
+    request.onerror = () => {
+        alert("Gagal menghapus data dari database.");
     };
 };
 
@@ -140,13 +146,29 @@ document.getElementById('btn-del-all').addEventListener('click', () => {
 
     document.getElementById('confirm-del').addEventListener('click', async () => {
         const pass = document.getElementById('del-password').value;
-        if (pass === 'admin') {
-            await dbClear('inventory');
-            loadInventory();
-            updateDbSize();
-            showSuccessModal("Seluruh data inventory berhasil dihapus!");
+        
+        // Menggunakan password yang sama dengan login atau beda (sesuai keinginan Anda)
+        if (pass === 'admin') { 
+            try {
+                // 1. Bersihkan Store Inventory
+                await dbClear('inventory');
+                
+                // 2. Bersihkan Store Transaksi (Kunci agar sinkron!)
+                await dbClear('transaksi');
+
+                // 3. Refresh Tampilan
+                loadInventory();
+                if (typeof loadTransactions === 'function') loadTransactions();
+                updateDbSize();
+                
+                closeModal();
+                showSuccessModal("Sistem berhasil dikosongkan (Inventory & Transaksi)!");
+            } catch (err) {
+                console.error(err);
+                alert("Gagal mengosongkan database.");
+            }
         } else {
-            alert("Password salah!");
+            alert("Password salah! Data aman.");
         }
     });
 });

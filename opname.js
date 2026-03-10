@@ -8,6 +8,7 @@ document.getElementById('btn-add-opname').addEventListener('click', async () => 
         <datalist id="list-opname">${options}</datalist>
         <input type="number" id="opname-fisik" placeholder="Jumlah Fisik Sebenarnya" class="mt-2" style="width:100%; padding:8px;">
         <button class="btn btn-primary mt-2" onclick="saveOpname()">Update ke Inventory</button>
+        <button class="btn btn-secondary mt-2" onclick="closeModal()">Batal</button>
     `);
 });
 

@@ -1,6 +1,13 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
+    <script>
+    // Cek status login sebelum halaman dimuat
+    if (sessionStorage.getItem('isLoggedIn') !== 'true') {
+        window.location.href = 'login.html';
+    }
+    
+</script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Aplikasi Gudang Offline</title>
@@ -12,6 +19,12 @@
             <div class="sidebar-header">
                 <h2>Gudang App</h2>
             </div>
+            <div class="sidebar-footer" style="padding: 1rem; border-top: 1px solid #eee;">
+    <div class="flex items-center justify-between bg-slate-100 p-2 rounded-lg">
+        <span class="text-xs font-bold text-slate-500">Database: </span>
+        <span id="db-size" class="text-xs font-mono font-bold text-indigo-600 bg-white px-2 py-1 rounded border">0 KB</span>
+    </div>
+</div>
             <nav class="sidebar-nav">
                 <a href="#" data-target="dashboard" class="active">Dashboard</a>
                 <a href="#" data-target="inventory">Inventory</a>
@@ -19,9 +32,8 @@
                 <a href="#" data-target="opname">Opname</a>
                 <a href="#" data-target="order">Order</a>
             </nav>
-            <div class="sidebar-footer">
-                <small>DB Size: <span id="db-size">0 KB</span></small>
-            </div>
+
+            
         </aside>
 
         <main id="main-content">
@@ -37,10 +49,14 @@
                         <div class="stat-card" style="border-left: 4px solid #2ecc71;">Tx Masuk: <span id="stat-masuk">0</span></div>
                         <div class="stat-card" style="border-left: 4px solid #e74c3c;">Tx Keluar: <span id="stat-keluar">0</span></div>
                     </div>
-                    <div class="actions mt-2">
-                        <button id="btn-import" class="btn btn-primary">Import JSON</button>
-                        <button id="btn-export" class="btn btn-secondary">Export JSON</button>
-                    </div>
+                    <div class="actions mt-2 flex gap-2">
+    <button id="btn-import" class="btn btn-primary px-4 py-2 bg-indigo-6000 text-white rounded-lg font-semibold hover:bg-indigo-700 transition">Import JSON</button>
+    <button id="btn-export" class="btn btn-secondary px-4 py-2 bg-slate-500 text-white rounded-lg font-semibold hover:bg-slate-600 transition">Export JSON</button>
+        <button onclick="logout()" 
+            class="px-4 py-2 bg-red-600 text-white rounded-lg font-semibold hover:bg-red-700 hover:shadow-md active:scale-95 transition-all duration-200">
+        Keluar Sesi
+    </button>
+</div>
                     <div id="progress-container" style="display: none;" class="mt-2">
                         <progress id="import-progress" value="0" max="100" style="width: 100%;"></progress>
                     </div>
@@ -139,6 +155,12 @@
             <div id="modal-content"></div>
         </div>
     </div>
+    <script>
+    const logout = () => {
+    sessionStorage.removeItem('isLoggedIn');
+    window.location.href = 'login.html';
+};
+    </script>
 
     <script src="db.js"></script>
     <script src="ui.js"></script>

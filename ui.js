@@ -24,11 +24,27 @@ const showSuccessModal = (message) => {
 
 // Update DB Size dynamically
 const updateDbSize = async () => {
-    if (navigator.storage && navigator.storage.estimate) {
-        const estimate = await navigator.storage.estimate();
-        const usageKB = (estimate.usage / 1024).toFixed(2);
-        const usageMB = (estimate.usage / (1024 * 1024)).toFixed(2);
-        const display = estimate.usage > 1024 * 1024 ? `${usageMB} MB` : `${usageKB} KB`;
-        document.getElementById('db-size').innerText = display;
+    // Sesuaikan ID dengan HTML kamu yaitu "db-size"
+    const display = document.getElementById('db-size');
+    if (!display) return; 
+
+    try {
+        // Mengambil data untuk estimasi ukuran string
+        const invData = await dbGetAll('inventory');
+        const txData = await dbGetAll('transaksi');
+        
+        // Menghitung ukuran karakter sebagai representasi Bytes
+        const totalString = JSON.stringify(invData) + JSON.stringify(txData);
+        const bytes = new Blob([totalString]).size;
+        
+        if (bytes < 1024) {
+            //display.innerText = `${bytes} B`;
+            display.innerText = `😌`;
+        } else {
+            // Mengubah ke KB dengan 2 angka di belakang koma
+            display.innerText = `${(bytes / 1024).toFixed(2)} KB`;
+        }
+    } catch (err) {
+        console.error("Gagal update size:", err);
     }
 };

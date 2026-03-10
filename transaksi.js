@@ -110,7 +110,8 @@ window.editTransaksi = async (tx_id, inv_id, oldQty, tipe) => {
     showModal(`
         <h3>Edit Jumlah Transaksi</h3>
         <input type="number" id="edit-qty" value="${oldQty}" class="mt-2" style="width:100%; padding:8px;">
-        <button class="btn btn-primary mt-2" onclick="confirmEditTx(${tx_id}, '${inv_id}', ${oldQty}, '${tipe}')">Update</button>
+        <button class="btn btn-primary mt-2" onclick="confirmEditTx(${tx_id}, '${inv_id}', ${oldQty}, '${tipe}')">Simpan</button>
+        <button class="btn btn-secondary mt-2" onclick="closeModal()">Batal</button>
     `);
 };
 
